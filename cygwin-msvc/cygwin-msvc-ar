@@ -1,0 +1,64 @@
+#!/bin/sh
+
+quit()
+{
+	echo $1
+	exit 0
+}
+
+extract()
+{
+	if [ -e $1 ]
+	then
+		libfile=${1#/cygdrive/}
+		if [ $libfile != $1 ]
+		then
+			driver=${libfile:0:1}
+			libfile=$driver:${libfile#?}
+		fi	
+		if result=$(lib /LIST $libfile)
+		then
+			for out in $result
+			do
+				file=${out##*/}
+				obj=${file%?}
+				#path=${1%/*.*}
+				path=${PWD}
+				case $obj in
+					*.obj)
+					lib /OUT:$obj $libfile
+					#mv -f $obj $path
+					exit 0
+					;;
+				esac
+			done
+			quit "$1 can not extract obj file" 1
+		else
+			echo "$1 LIST failed"
+		fi
+	else
+		quit "$1 No sush file or directory" 1
+	fi
+}
+
+echo "ar $*" >> $0.log
+for opt in $@;
+do
+	case $opt in
+		x)
+		option=$opt
+		;;
+		*.lib|*.*)
+		if [ $option = "x" ] ;
+		then
+			extract $opt;
+		else
+			quit "Unknow option $opt" 1
+		fi
+		;;
+		*)
+		quit "Unknow option $opt" 1
+		;;
+	esac
+	shift
+done

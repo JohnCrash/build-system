@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "cl $*" >> $0.log
+/bin/dlltool $* >> $0.log
