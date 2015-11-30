@@ -26,7 +26,7 @@ extract()
 				path=${PWD}
 				case $obj in
 					*.obj)
-					lib /OUT:$obj $libfile
+					${MSVC}/lib /OUT:$obj $libfile
 					#mv -f $obj $path
 					exit 0
 					;;

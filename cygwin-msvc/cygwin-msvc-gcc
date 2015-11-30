@@ -1,4 +1,4 @@
 #!/bin/sh
 
 echo "cl $*" >> $0.log
-/cygdrive/E/Microsoft\ Visual\ Studio\ 12.0/VC/bin/cl $* >> $0.log
+${MSVC}/cl $* >> $0.log

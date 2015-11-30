@@ -70,4 +70,4 @@ else
 fi
 
 echo $cmdargs>>$0.log
-/cygdrive/E/Microsoft\ Visual\ Studio\ 12.0/VC/bin/cl $cmdargs >> $0.log
+${MSVC}/cl $cmdargs >> $0.log
