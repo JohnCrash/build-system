@@ -64,7 +64,7 @@ for opt in $@; do
 done
 
 if test -z $OUTTYPE && test -z $OUTFILE ; then
-	cmdargs="$OUTFILE $INPUTFILE $DEFINE $INCLUDE"
+	cmdargs="-g -c $INPUTFILE $DEFINE $INCLUDE"
 else
 	cmdargs="-o $OUTFILE $INPUTFILE $SYSTEMLIBRARY $OUTTYPE"
 fi
