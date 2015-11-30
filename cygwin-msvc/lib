@@ -1,4 +1,4 @@
 #!/bin/sh
 
 echo "lib $*" >> $0.log
-${MSVC}/lib $*
+"${MSVC}"/lib $*
