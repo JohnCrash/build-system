@@ -1,29 +1,33 @@
 #!/bin/sh
 
 echo "cl $*" >> $0.log
-INPUTFILE=""
-DEFINE=""
-INCLUDE=""
-SYSTEMLIBRARY="advapi32.lib Advapi32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Ws2_32.lib"
+LOCAL_INPUTFILE=""
+LOCAL_DEFINE=""
+LOCAL_INCLUDE=""
+LOCAL_SYSTEMLIBRARY="advapi32.lib Advapi32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Ws2_32.lib"
+LOCAL_COMPILE=""
 
 getpdbfile()
 {
-	PDBFILE="${1%.*}.pdb"
+	LOCAL_PDBFILE="${1%.*}.pdb"
 }
 
 for opt in $@; do
 	case $opt in
 		-o)
 		shift
-		OUTFILE="$1"
-		getpdbfile $OUTFILE
+		LOCAL_OUTFILE="$1"
+		getpdbfile $LOCAL_OUTFILE
 		;;
 		-g)
 		;;
 		-link)
 		;;
+		-c)
+		LOCAL_COMPILE="-c"
+		;;
 		-dll)
-		OUTTYPE="-link -dll"
+		LOCAL_OUTTYPE="-link -dll"
 		;;
 		-Xlinker)
 		;;
@@ -36,13 +40,13 @@ for opt in $@; do
 		-nostdlib)
 		;;
 		-shared)
-		OUTTYPE="-link -dll"		
+		LOCAL_OUTTYPE="-link -dll"		
 		;;
 		-D*)
-		DEFINE="$DEFINE $opt"
+		LOCAL_DEFINE="$LOCAL_DEFINE $opt"
 		;;
 		-I*)
-		INCLUDE="$INCLUDE $opt"
+		LOCAL_INCLUDE="$LOCAL_INCLUDE $opt"
 		;;
 		-c)
 		;;
@@ -50,7 +54,9 @@ for opt in $@; do
 		echo "igrone option $opt"
 		;;
 		*.obj|*.c|*.cpp|*.h|*.hpp|*.lib)
-		INPUTFILE="$INPUTFILE $opt"
+		if [ "x$LOCAL_OUTFILE" != "x$opt" ]; then
+			LOCAL_INPUTFILE="$LOCAL_INPUTFILE $opt"
+		fi
 		;;
 		*.*)
 		echo "igrone file $opt"
@@ -63,11 +69,11 @@ for opt in $@; do
 	shift
 done
 
-if test -z $OUTTYPE && test -z $OUTFILE ; then
-	cmdargs="-g -c $INPUTFILE $DEFINE $INCLUDE"
+if test -z $LOCAL_COMPILE ; then
+	cmdargs="-o $LOCAL_OUTFILE $LOCAL_INPUTFILE $LOCAL_SYSTEMLIBRARY $LOCAL_INCLUDE $LOCAL_OUTTYPE"
 else
-	cmdargs="-o $OUTFILE $INPUTFILE $SYSTEMLIBRARY $OUTTYPE"
+	cmdargs="-g -c $LOCAL_INPUTFILE $LOCAL_DEFINE $LOCAL_INCLUDE"	
 fi
 
-echo $cmdargs>>$0.log
-"${MSVC}"/cl $cmdargs >> $0.log
+echo "${MSVC}"/cl $cmdargs>>$0.log
+"${MSVC}"/cl $cmdargs>>$0.log
