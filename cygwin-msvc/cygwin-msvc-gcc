@@ -1,4 +1,102 @@
 #!/bin/sh
 
 echo "cl $*" >> $0.log
-"${MSVC}"/cl $* >> $0.log
+LOCAL_INPUTFILE=""
+LOCAL_DEFINE=""
+LOCAL_INCLUDE=""
+LOCAL_SYSTEMLIBRARY="advapi32.lib Advapi32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Ws2_32.lib"
+LOCAL_COMPILE=""
+#-link后面的全部参数都会传送给linker
+LOCAL_OUTTYPE="-link"
+getpdbfile()
+{
+	LOCAL_PDBFILE="${1%.*}.pdb"
+}
+#做参数转换
+#DEBUG 环境变量如果设置就编译为带调试信息的
+#DEBUG 没有设置默认就输出不带调试信息的并并且做速度优化
+while [ $# -gt 0 ]
+do
+	case $1 in
+		-o)
+		shift
+		LOCAL_OUTFILE="$1"
+		getpdbfile $LOCAL_OUTFILE
+		shift
+		;;
+		-g)
+		;;
+		-link)
+		;;
+		-c)
+		LOCAL_COMPILE="-c"
+		;;
+		-dll)
+		LOCAL_OUTTYPE="$LOCAL_OUTTYPE -dll"
+		;;
+		-Xlinker)
+		;;
+		--out-implib)
+		;;
+		-Xlinker)
+		;;
+		--enable-auto-image-base)
+		;;
+		-nostdlib)
+		;;
+		-shared)
+		LOCAL_OUTTYPE="$LOCAL_OUTTYPE -dll"	
+		;;
+		-D*)
+		if [ "x$1" = "x-DDEBUG" ] || [ "x$1" = "x-D_DEBUG" ]; then
+			DEBUG=1
+		fi
+		LOCAL_DEFINE="$LOCAL_DEFINE $1"
+		;;
+		-I*)
+		LOCAL_INCLUDE="$LOCAL_INCLUDE $1"
+		;;
+		-c)
+		;;
+		-*)
+		echo "igrone option $1"
+		;;
+		*.obj|*.c|*.cpp|*.h|*.hpp|*.lib)
+		LOCAL_INPUTFILE="$LOCAL_INPUTFILE $1"
+		;;
+		*.*)
+		echo "igrone file $1"
+		;;
+		*)
+		echo "invalid argument $1"
+		break
+		;;
+	esac
+	shift
+done
+
+COMM_OPT="-nologo -Zi -Gy -GS -EHsc -W3 -MP -fp:precise"
+ARCH_OPT="-MACHINE:X86"
+#如果是DEBUG模式
+if [ "x$DEBUG" = "x1" ] ; then
+	if test -z $LOCAL_COMPILE ; then
+	#链接模式
+		cmdargs="$COMM_OPT -Od -MDd -RTC1 -Fe$LOCAL_OUTFILE $LOCAL_INPUTFILE $LOCAL_SYSTEMLIBRARY $LOCAL_INCLUDE $LOCAL_OUTTYPE -DEBUG  $ARCH_OPT -PDB:$LOCAL_PDBFILE"
+	else
+	#仅编译
+		cmdargs="$COMM_OPT -Od -MDd -RTC1 $LOCAL_DEFINE $LOCAL_INCLUDE -c $LOCAL_INPUTFILE"
+	fi
+else
+#如果不是DEBUG模式
+	if test -z $LOCAL_COMPILE ; then
+	#链接模式
+		cmdargs="$COMM_OPT -O2 -Ob1 -Oi -MD -Fe$LOCAL_OUTFILE $LOCAL_INPUTFILE $LOCAL_SYSTEMLIBRARY $LOCAL_INCLUDE $LOCAL_OUTTYPE $ARCH_OPT -PDB:$LOCAL_PDBFILE"
+	else
+	#仅编译
+		cmdargs="$COMM_OPT -O2 -Ob1 -Oi -MD $LOCAL_DEFINE $LOCAL_INCLUDE -c $LOCAL_INPUTFILE"
+	fi
+fi
+
+echo "cl $cmdargs" 
+echo "cl $cmdargs">>$0.log
+"${MSVC}"/cl $cmdargs>>$0.log
