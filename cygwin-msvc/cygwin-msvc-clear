@@ -1,0 +1,4 @@
+#!/bin/bash
+
+dir=${0%/*}
+(cd $dir;rm -f *.log)

@@ -14,7 +14,7 @@ getpdbfile()
 }
 #做参数转换
 #DEBUG 环境变量如果设置就编译为带调试信息的
-#DEBUG 没有设置默认就输出不带调试信息的并并且做速度优化
+#DEBUG 没有设置默认就输出不带调试信息的并且做速度优化
 while [ $# -gt 0 ]
 do
 	case $1 in
@@ -99,4 +99,4 @@ fi
 
 echo "cl $cmdargs" 
 echo "cl $cmdargs">>$0.log
-"${MSVC}"/cl $cmdargs>>$0.log
+"${MSVC}"/cl $cmdargs
