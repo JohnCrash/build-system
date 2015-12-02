@@ -1,6 +1,7 @@
 #!/bin/sh
 
-echo "cl $*" >> $0.log
+#echo "cl $*" >> $0.log
+echo "cygwin-msvc-gcc $*"
 LOCAL_INPUTFILE=""
 LOCAL_DEFINE=""
 LOCAL_INCLUDE=""
@@ -59,16 +60,16 @@ do
 		-c)
 		;;
 		-*)
-		echo "igrone option $1"
+		echo "Warning : igrone option $1"
 		;;
 		*.obj|*.c|*.cpp|*.h|*.hpp|*.lib)
 		LOCAL_INPUTFILE="$LOCAL_INPUTFILE $1"
 		;;
 		*.*)
-		echo "igrone file $1"
+		echo "Warning : igrone file $1"
 		;;
 		*)
-		echo "invalid argument $1"
+		echo "Warning : invalid argument $1"
 		break
 		;;
 	esac
@@ -84,6 +85,15 @@ if ! [ -z $LOCAL_OUTFILE ] ; then
 	else
 		LOCAL_OUTFILE="-Fo$LOCAL_OUTFILE"
 	fi
+fi
+#如果有一些附加的库需要增加可以使用，两个环境变量来实现
+#msvc_CFLAGS,msvc_LDFLAGS,前者附加到LOCAL_INCLUDE,LOCAL_SYSTEMLIBRARY
+#这也可以解决libtool忽略库的问题。libtool在检查库的时候如果它认为不合法会忽略
+if ! [ -z $msvc_CFLAGS ] ; then
+	LOCAL_INCLUDE="$LOCAL_INCLUDE $msvc_CFLAGS"
+fi
+if ! [ -z $msvc_LDFLAGS ] ; then
+	LOCAL_SYSTEMLIBRARY="$LOCAL_SYSTEMLIBRARY $msvc_LDFLAGS"
 fi
 #如果是DEBUG模式
 if [ "x$DEBUG" = "x1" ] ; then
@@ -106,5 +116,5 @@ else
 fi
 
 echo "cl $cmdargs" 
-echo "cl $cmdargs">>$0.log
+#echo "cl $cmdargs">>$0.log
 "${MSVC}"/cl $cmdargs
