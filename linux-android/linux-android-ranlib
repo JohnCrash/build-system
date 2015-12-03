@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "$0 $*"
+echo "$0 $*" >> $0.log
+"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-ranlib $* >> $0.log

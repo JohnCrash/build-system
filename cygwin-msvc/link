@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "link $*" >> $0.log
+"${MSVC}"/link $*
