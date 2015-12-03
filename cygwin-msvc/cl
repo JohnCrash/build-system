@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "cl $*" >> $0.log
+"${MSVC}"/cl $*
