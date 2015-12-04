@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "$0 $*"
+#echo "$0 $*"
 echo "$0 $*" >>$0.log
 #如果路径是以/cygdrive开头的需要转换为windows路径
 #命令行中ndk只认windows路径或者以/分割的相对路径
@@ -18,5 +18,5 @@ cygwin2windows()
 	echo $window
 }
 window_NDK_PLATFORM=$(cygwin2windows $NDK_PLATFORM)
-echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} $*"
+echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} $*" >> $0.log
 "${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} $* >>$0.log
