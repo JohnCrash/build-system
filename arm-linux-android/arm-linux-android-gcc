@@ -18,5 +18,34 @@ cygwin2windows()
 	echo $window
 }
 window_NDK_PLATFORM=$(cygwin2windows $NDK_PLATFORM)
-echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} $*" >> $0.log
-"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} $* >>$0.log
+#如果输入中有输入文件列表时后缀.lnkscript,内部INPUT (filelist)的文件。
+#列表文件中的文件将相对于.lnkscript,但是有时.lnkscript文件不在恰当的位置。
+#下面测试列表文件的文字如果不在合适位置就测试以当前位置为起点测试。
+#如果通过就将.lnkscript复制到当前位置，并取得.lnkscript的相对路径然后在编译
+gcc_OPT=""
+gcc_INPUTFILE=""
+lnkscript2pwd()
+{
+	if [ -e $1 ] ; then
+		for file in `cat $1 | grep \.o$` ;
+		do
+		done
+	else
+		echo "error : input file $1 is not exist"
+		exit 1
+	fi
+}
+while [ $# -gt 0 ] ;
+do
+	case $1 in
+		*.lnkscript)
+		lnkscript2pwd $1
+		;;
+		*)
+		gcc_OPT="${gcc_OPT} $1"
+		;;
+	esac
+	shift
+done
+echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE}" >> $0.log
+"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE} >>$0.log
