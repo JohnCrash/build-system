@@ -1,0 +1,22 @@
+#!/bin/sh
+echo "$0 $*"
+echo "$0 $*" >>$0.log
+#如果路径是以/cygdrive开头的需要转换为windows路径
+#命令行中ndk只认windows路径或者以/分割的相对路径
+#判断是否以/cygdrive/开头，如果是就删除。然后在第一个字母前插入:
+cygwin2windows()
+{
+	local window
+	local drive
+	if echo $1 | grep /cygdrive/ | /dev/null ; then
+		window=${1#/cygdrive/}
+		drive=${window:0:1}
+		window=${drive}':'${window:1}
+	else
+		window=${1}
+	fi
+	echo $window
+}
+window_NDK_PLATFORM=$(cygwin2windows $NDK_PLATFORM)
+echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} $*"
+"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} $* >>$0.log

@@ -1,5 +1,0 @@
-#!/bin/sh
-echo "$0 $*"
-echo "$0 $*" >>$0.log
-echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc $* --sysroot=${NDK_PLATFORM}"
-"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc $* --sysroot=${NDK_PLATFORM} >>$0.log
