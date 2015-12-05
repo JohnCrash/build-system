@@ -60,18 +60,39 @@ do
 		;;
 		-c)
 		;;
+		--dynamicbase)
+		#Randomized Base Address
+		LOCAL_OUTTYPE="$LOCAL_OUTTYPE -dynamicbase"	
+		;;
+		--nxcompat)
+		#Data Execution Prevention (DEP)
+		LOCAL_OUTTYPE="$LOCAL_OUTTYPE -nxcompat"
+		;;
+		--safeseh)
+		#Image Has Safe Exception Handlers
+		LOCAL_OUTTYPE="$LOCAL_OUTTYPE -safeseh"	
+		;;
+		--manifest)
+		#Generate Manifest
+		LOCAL_OUTTYPE="$LOCAL_OUTTYPE -manifest"	
+		;;		
+		--output-def)
+		;;
 		-*)
 		echo "Warning : igrone option $1"
 		;;
 		*.obj|*.c|*.cpp|*.h|*.hpp|*.lib)
 		LOCAL_INPUTFILE="$LOCAL_INPUTFILE $1"
 		;;
+		-def)
+		;;
+		*.def)
+		;;
 		*.*)
 		echo "Warning : igrone file $1"
 		;;
 		*)
 		echo "Warning : invalid argument $1"
-		break
 		;;
 	esac
 	shift
