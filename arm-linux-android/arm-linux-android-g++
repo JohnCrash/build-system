@@ -1,6 +1,10 @@
 #!/bin/sh
-echo "$0 $*"
+#echo "$0 $*"
 echo "$0 $*" >>$0.log
+#必要的环境变量说明
+#NDK_PLATFORM,SDK选择例如:${NDK}/platforms/android-3/arch-arm
+#NDK_TOOLCHAINS,编译工具选择例如:${NDK}/toolchains/arm-linux-androideabi-4.8/prebuilt/windows
+
 #如果路径是以/cygdrive开头的需要转换为windows路径
 #命令行中ndk只认windows路径或者以/分割的相对路径
 #判断是否以/cygdrive/开头，如果是就删除。然后在第一个字母前插入:
@@ -17,6 +21,70 @@ cygwin2windows()
 	fi
 	echo $window
 }
-window_NDK_PLATFORM=$(cygwin2windows $NDK_PLATFORM)
-echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-g++ --sysroot=${window_NDK_PLATFORM} $*"
-"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-g++ --sysroot=${window_NDK_PLATFORM} $* >>$0.log
+#如果输入中有输入文件列表时后缀.lnkscript,内部INPUT (filelist)的文件。
+#列表文件中的文件将相对于.lnkscript,但是有时.lnkscript文件不在恰当的位置。
+#下面测试列表文件的文字如果不在合适位置就测试以当前位置为起点测试。
+#如果通过就将.lnkscript复制到当前位置，并取得.lnkscript的相对路径然后在编译
+gcc_OPT=""
+gcc_INPUTFILE=""
+lnkscript2pwd()
+{
+	local filename
+	local path
+	if [ -e $1 ] ; then
+		path=${1%/*.*}
+		if [ -z path ]; then
+			#列表存在且就在当前目录下面
+			gcc_INPUTFILE=$1
+			return 0
+		fi
+		if [ ${1:0:1} = / ]; then
+			filename=${1##/*/}
+		else
+			filename=${1##*/}
+		fi
+		for file in `cat $1 | grep \.[coh"cpp""cxx""hpp"]$` ;
+		do
+			#检查从当前位置看文件是否存在
+			if [ -e $file ] 
+			then
+				#沿当前目录可以找到输入文件，复制到当前目录下
+				cp -f $1 .
+				gcc_INPUTFILE=$filename
+				return 0				
+			else
+				#假设源文件正确，如果那里不对让gcc编译器报告错误，这里不做进一步检查
+				gcc_INPUTFILE=$1
+				return 0
+			fi
+		done
+		echo "error : input file $1 is empty"
+		exit 1
+		#检查当前目录为偏移的文件存在
+	else
+		echo "error : input file $1 is not exist"
+		exit 1
+	fi
+}
+while [ $# -gt 0 ] ;
+do
+	case $1 in
+		*.lnkscript)
+		lnkscript2pwd $1
+		;;
+		*)
+		gcc_OPT="${gcc_OPT} $1"
+		;;
+	esac
+	shift
+done
+
+#如果是在NDK目录下面的工具链就需要加--sysroot来指定platform，否则就不需要加。
+if [ x${NDK_TOOLCHAINS#"$NDK"} = x${NDK_TOOLCHAINS} ] ; then
+	echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc ${gcc_OPT} ${gcc_INPUTFILE}"
+	"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-g++ ${gcc_OPT} ${gcc_INPUTFILE}
+else
+	window_NDK_PLATFORM=$(cygwin2windows $NDK_PLATFORM)
+	echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE}"
+	"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-g++ --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE}
+fi
