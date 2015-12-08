@@ -21,7 +21,6 @@ cygwin2windows()
 	fi
 	echo $window
 }
-window_NDK_PLATFORM=$(cygwin2windows $NDK_PLATFORM)
 #如果输入中有输入文件列表时后缀.lnkscript,内部INPUT (filelist)的文件。
 #列表文件中的文件将相对于.lnkscript,但是有时.lnkscript文件不在恰当的位置。
 #下面测试列表文件的文字如果不在合适位置就测试以当前位置为起点测试。
@@ -79,5 +78,13 @@ do
 	esac
 	shift
 done
-echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE}" >> $0.log
-"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE} >>$0.log
+
+#如果是在NDK目录下面的工具链就需要加--sysroot来指定platform，否则就不需要加。
+if [ x${NDK_TOOLCHAINS#"$NDK"} = x${NDK_TOOLCHAINS} ] ; then
+	echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc ${gcc_OPT} ${gcc_INPUTFILE}"
+	"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc ${gcc_OPT} ${gcc_INPUTFILE}
+else
+	window_NDK_PLATFORM=$(cygwin2windows $NDK_PLATFORM)
+	echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE}"
+	"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-gcc --sysroot=${window_NDK_PLATFORM} ${gcc_OPT} ${gcc_INPUTFILE}
+fi
