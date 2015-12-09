@@ -18,6 +18,6 @@ export DEBUG=1<br/>
 
 ###ndk
 需要配置NDK环境变量，和NDK_TOOLCHAINS。<br/>
-有两种方法来配置NDK的编译环境，可以参加NDK文档docs/STANDALONE-TOOLCHAIN.html。<br/>
+有两种方法来配置NDK的编译环境，可以参见NDK文档docs/STANDALONE-TOOLCHAIN.html。<br/>
 一种你需要设置环境变量NDK_PLATFORM，并且NDK_TOOLCHAINS在NDK路径之下。<br/>
 也就文档中说的hard mode。还可以使用easy mode创建一个独立的编译环境。然后配置NDK_TOOLCHAINS。<br/>

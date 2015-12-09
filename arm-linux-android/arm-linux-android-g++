@@ -79,7 +79,8 @@ do
 	shift
 done
 
-#如果是在NDK目录下面的工具链就需要加--sysroot来指定platform，否则就不需要加。
+#如果是在NDK目录下面的工具链就需要加--sysroot来指定platform
+#否则假设它是一个独立的编译工具，就不需要加。
 if [ x${NDK_TOOLCHAINS#"$NDK"} = x${NDK_TOOLCHAINS} ] ; then
 	echo "${NDK_TOOLCHAINS}/bin/arm-linux-androideabi-gcc ${gcc_OPT} ${gcc_INPUTFILE}"
 	"${NDK_TOOLCHAINS}"/bin/arm-linux-androideabi-g++ ${gcc_OPT} ${gcc_INPUTFILE}
