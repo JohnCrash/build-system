@@ -39,6 +39,6 @@ if [ $arch_exits = no ] ; then
 	ARCH=armv7
 fi
 SYSROOT="${TOOLCHAINS}/Platforms/${PLATFORM}.platform/Developer/SDKs/${PLATFORM}${SDKVERSION}.sdk"
-CLANG="${TOOLCHAINS}/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+LD="${TOOLCHAINS}/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld"
 
-CLANG -arch ${ARCH} --sysroot=${PLATFORM} $*
+LD -arch ${ARCH} --sysroot=${PLATFORM} $*
