@@ -1,0 +1,2 @@
+echo $0 $*
+arm-ios-darwin-gcc $*
