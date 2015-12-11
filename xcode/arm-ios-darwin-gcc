@@ -1,26 +1,28 @@
-echo $0 $*
+#!/bin/sh
+echo $0 $* > 2
+echo $0 $* >> $0.log
 TOOLCHAINS=`xcode-select -p`
 if [ -z $TOOLCHAINS ] ; then
-	echo "error : can not find TOOLCHAINS"
+	echo "error : can not find TOOLCHAINS" > 2
 	exit 1
 fi
 
 if [ -z $PLATFORM ] ; then
-	echo "warning : can not find PLATFORM,default iPhoneOS"
+	echo "warning : can not find PLATFORM,default iPhoneOS" > 2
 	PLATFORM=iPhoneOS	
 fi
 #检查PLATFORM是否可用
 if ! [ -d "${TOOLCHAINS}/Platforms/${PLATFORM}.platform" ] ; then
-	echo "error : can not find PLATFORM ${PLATFORM}"
+	echo "error : can not find PLATFORM ${PLATFORM}" > 2
 	exit 1
 fi
 #检查使用的SDKVERSION
 if ! [ -z $SDKVERSION ] ; then
-	echo "warning : can not find SDKVERSION"
+	echo "warning : can not find SDKVERSION" > 2
 fi
 if ! [ -d "${TOOLCHAINS}/Platforms/${PLATFORM}.platform/Developer/SDKs/${PLATFORM}${SDKVERSION}.sdk" ] ; then
 	#设置一个默认值
-	echo "error : can not find $SDKVERSION"	
+	echo "error : can not find $SDKVERSION"	> 2
 fi
 
 #检查ARCH，这个必须是下面中的一个
@@ -28,17 +30,25 @@ fi
 arch_exits=no
 for arch in "armv7 armv7s arm64 i386" 
 do
-	echo $arch
+	echo $arch > 2
 	if [ "x$arch" = "x$ARCH" ] ; then
 		arch_exits=yes	
 		break
 	fi
 done
 if [ $arch_exits = no ] ; then
-	echo "waring : ARCH not defined or invalid value,default armv7"
+	echo "waring : ARCH not defined or invalid value,default armv7" > 2
 	ARCH=armv7
 fi
 SYSROOT="${TOOLCHAINS}/Platforms/${PLATFORM}.platform/Developer/SDKs/${PLATFORM}${SDKVERSION}.sdk"
 CLANG="${TOOLCHAINS}/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+#-miphoneos-version-min=9.0
+#-march=armv7-a
+#-std=c99
+#-fPIC
+#-mthumb
+#-pthread
+#-fomit-frame-pointer
 
-CLANG -arch ${ARCH} --sysroot=${PLATFORM} $*
+echo "$CLANG -arch ${ARCH} --sysroot ${SYSROOT} $*" >> $0.log
+${CLANG} -arch ${ARCH} --sysroot ${SYSROOT} $*

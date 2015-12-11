@@ -1,4 +1,6 @@
+#!/bin/sh
 echo $0 $*
+echo $0 $* >> $0.log
 TOOLCHAINS=`xcode-select -p`
 if [ -z $TOOLCHAINS ] ; then
 	echo "error : can not find TOOLCHAINS"
@@ -41,4 +43,6 @@ fi
 SYSROOT="${TOOLCHAINS}/Platforms/${PLATFORM}.platform/Developer/SDKs/${PLATFORM}${SDKVERSION}.sdk"
 LD="${TOOLCHAINS}/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld"
 
-LD -arch ${ARCH} --sysroot=${PLATFORM} $*
+"$CLANG -arch ${ARCH} --sysroot ${SYSROOT} $*" >> $0.log
+${LD} -arch ${ARCH} --sysroot ${SYSROOT} $*
+
