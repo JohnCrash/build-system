@@ -21,3 +21,10 @@ export DEBUG=1<br/>
 有两种方法来配置NDK的编译环境，可以参见NDK文档docs/STANDALONE-TOOLCHAIN.html。<br/>
 一种你需要设置环境变量NDK_PLATFORM，并且NDK_TOOLCHAINS在NDK路径之下。<br/>
 也就文档中说的hard mode。还可以使用easy mode创建一个独立的编译环境。然后配置NDK_TOOLCHAINS。<br/>
+
+###ios
+需要配置变量PLATFORM,可能的值有iPhoneOS,iPhoneSimulator,MacOSX,WatchOS,WatchSimulator..默认值为iPhoneOS<br/>
+还需要配置SDKVERSION,可能的只有iPhoneOS,iPhoneO8.0..,默认值为iPhoneOS<br/>
+配置目标架构ARCH,可能的值有armv7 armv7s arm64 i386..,默认值为armv7<br/>
+如果你要编译多架构目标可以使用lipo将多个库打包在一起。<br/>
+
