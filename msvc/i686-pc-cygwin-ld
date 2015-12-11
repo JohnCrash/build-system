@@ -1,4 +1,4 @@
 #!/bin/sh
 
 echo "ld $*" >> $0.log
-#"${MSVC}"/link $* >> $0.log
+"${MSVC}"/link $* >> $0.log
