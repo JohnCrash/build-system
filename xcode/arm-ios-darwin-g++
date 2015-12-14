@@ -1,2 +1,3 @@
 echo $0 $*
+echo $0 $* >> $0.log
 arm-ios-darwin-gcc $*

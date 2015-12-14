@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo $0 $* > 2
+echo $0 $* >> $0.log
+TOOLCHAINS=`xcode-select -p`
+AR="${TOOLCHAINS}/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar"
+$AR $*
